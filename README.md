@@ -1,10 +1,18 @@
 # Rogue Engine VR Starter Project
 This repository aims to give a developer a quick start on developing WebXR experiences, using [Rogue Engine](rogueengine.io). It contains a scene with you can grab the sphere by gripping your controller, and changing its color by selecting it.
 
+# To start
+* Download [Rogue Engine](https://rogueengine.io/download/).
+* Clone this repository or download it as a ZIP.
+* Run `npm install` to get all the dependencies.
+* Start Rogue Engine, open this project and navigate to `Example.rogueScene`.
+
 # Tips
 * Use a browser while developing your experience. You won't be able to try out VR in the editor.
 * Install the [WebXR Emulator extension](https://github.com/MozillaReality/WebXR-emulator-extension) to test before wearing your headset.
 * Attach the camera and controllers as children to an Object3D. This will allow you to move the player around.
+* Make sure that `https://` is enabled in Rogue Engine(in the upper-right, next to the IP) to allow the WebXR API to work when testing on a headset.
+
 
 # Components
 
@@ -19,7 +27,6 @@ This component will copy the position and rotation from one of the controllers.
 |-------|------|---------|-------------|
 | hand  | 'left' 'right' | 'left' | Which controller to imitate |
 | showControllerModel  | boolean | true  | Whether to add a 3D model of the controller via [webxr-input-profiles](https://github.com/immersive-web/webxr-input-profiles |
-|   |   |   |   |
 
 ### Usage
 * Attach this component to an Object3D that will represent the user's left or right hand.
