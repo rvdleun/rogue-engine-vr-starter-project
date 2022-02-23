@@ -7,6 +7,9 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 export default class XRInputSource extends RE.Component {
   public static sources: XRInputSource[] = [];
 
+  @Prop("Number")
+  public controllerId: number = 0;
+
   @Prop("Boolean")
   private isRightHand: boolean = true;
 
@@ -21,6 +24,11 @@ export default class XRInputSource extends RE.Component {
 
   awake() {
     XRInputSource.sources.push(this);
+
+    const { renderer } = Runtime;
+    renderer.xr.getController(this.controllerId);
+    renderer.xr.getControllerGrip(this.controllerId);
+
     this.handedness = this.isRightHand ? 'right' : 'left';
   }
 
@@ -29,11 +37,6 @@ export default class XRInputSource extends RE.Component {
       this.detectController();
       return;
     }
-  }
-
-  onRemoved() {
-    super.onRemoved();
-    XRInputSource.sources = XRInputSource.sources.filter(source => source !== this);
   }
 
   async detectController() {
@@ -94,7 +97,7 @@ export default class XRInputSource extends RE.Component {
       return;
     }
 
-    console.log('Adding event', event);
+    console.log('It is me', this.handedness, this.controller);
     this.controller.addEventListener(event, func);
   }
 }
