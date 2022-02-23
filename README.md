@@ -26,7 +26,7 @@ This component will copy the position and rotation from one of the controllers.
 | Name  | Type | Default | Description |
 |-------|------|---------|-------------|
 | hand  | 'left' 'right' | 'left' | Which controller to imitate |
-| showControllerModel  | boolean | true  | Whether to add a 3D model of the controller via [webxr-input-profiles](https://github.com/immersive-web/webxr-input-profiles |
+| showControllerModel  | boolean | true  | Whether to add a 3D model of the controller via [webxr-input-profiles](https://github.com/immersive-web/webxr-input-profiles) |
 
 ### Usage
 * Attach this component to an Object3D that will represent the user's left or right hand.
