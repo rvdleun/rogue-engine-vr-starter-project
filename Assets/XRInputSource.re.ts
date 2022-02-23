@@ -5,8 +5,7 @@ import { Group } from 'three/src/objects/Group';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 export default class XRInputSource extends RE.Component {
-  @Prop("String")
-  private assetPath: string = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
+  public static sources: XRInputSource[] = [];
 
   @Prop("Boolean")
   private isRightHand: boolean = true;
@@ -14,11 +13,14 @@ export default class XRInputSource extends RE.Component {
   @Prop("Boolean")
   private showControllerModel: boolean = true;
 
+  private assetPath: string = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
   private controller: Group;
+  private events: { event: string, func: Function }[] = [];
   private grip: Group;
   private handedness: 'left' | 'right';
 
   awake() {
+    XRInputSource.sources.push(this);
     this.handedness = this.isRightHand ? 'right' : 'left';
   }
 
@@ -27,10 +29,11 @@ export default class XRInputSource extends RE.Component {
       this.detectController();
       return;
     }
+  }
 
-    const { position, rotation } = this.grip;
-    this.object3d.position.copy(position);
-    this.object3d.rotation.copy(rotation);
+  onRemoved() {
+    super.onRemoved();
+    XRInputSource.sources = XRInputSource.sources.filter(source => source !== this);
   }
 
   async detectController() {
@@ -42,10 +45,28 @@ export default class XRInputSource extends RE.Component {
     }
 
     const { inputSources } = session;
-    const controllerId = inputSources.findIndex(inputSource => inputSource.handedness === this.handedness);
+    if (!inputSources) {
+      return;
+    }
+
+    let controllerId: number = -1;
+    for (let id in inputSources) {
+      if (inputSources[id].handedness === this.handedness) {
+        controllerId = parseInt(id);
+      }
+    }
+
+    if (controllerId === -1) {
+      return;
+    }
+
     const xrInputSource = inputSources[controllerId];
     this.controller = renderer.xr.getController(controllerId);
     this.grip = renderer.xr.getControllerGrip(controllerId);
+    this.object3d.parent?.add(this.grip);
+    this.grip.add(this.object3d);
+
+    this.events.forEach(({ event, func }) => this.addEventListener(event, func));
 
     if (!this.showControllerModel) {
       return;
@@ -58,16 +79,22 @@ export default class XRInputSource extends RE.Component {
 
     const loader = new GLTFLoader();
     loader.load(
-      // resource URL
-      assetPath,
-      // called when the resource is loaded
-       ( gltf ) => {
-        this.object3d.add( gltf.scene );
-      }
+        // resource URL
+        assetPath,
+        // called when the resource is loaded
+        ( gltf ) => {
+          this.object3d.add( gltf.scene );
+        }
     );
   }
 
-  addEventListener(event, func) {
+  addEventListener(event: string, func) {
+    if (!this.controller) {
+      this.events.push({ event, func });
+      return;
+    }
+
+    console.log('Adding event', event);
     this.controller.addEventListener(event, func);
   }
 }

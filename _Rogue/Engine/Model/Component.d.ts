@@ -53,5 +53,5 @@ export default class Component extends Lifecycle {
     onObjectRemoved(): void;
 }
 export declare type ComponentInterface = {
-    [propName: string]: 'String' | 'Number' | 'Boolean' | 'Select' | 'Vector2' | 'Vector3' | 'Object3D' | 'Prefab' | 'Texture' | 'Material' | 'Component' | 'Audio' | 'Color' | 'PositionalAudio';
+    [propName: string]: 'String' | 'Number' | 'Boolean' | 'Select' | 'Vector2' | 'Vector3' | 'Object3D' | 'Prefab' | 'Texture' | 'Material' | 'Component' | 'Audio' | 'Color' | 'PositionalAudio' | 'AnimationClip';
 };
