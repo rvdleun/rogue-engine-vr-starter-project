@@ -7,11 +7,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 export default class XRInputSource extends RE.Component {
   public static sources: XRInputSource[] = [];
 
-  @Prop("Number")
-  public controllerId: number = 0;
-
-  @Prop("Boolean")
-  private isRightHand: boolean = true;
+  @Prop("Select")
+  private hand: string;
 
   @Prop("Boolean")
   private showControllerModel: boolean = true;
@@ -20,22 +17,23 @@ export default class XRInputSource extends RE.Component {
   private controller: Group;
   private events: { event: string, func: Function }[] = [];
   private grip: Group;
-  private handedness: 'left' | 'right';
+
+  get handOptions() {
+    return ['left', 'right'];
+  }
 
   awake() {
     XRInputSource.sources.push(this);
 
     const { renderer } = Runtime;
-    renderer.xr.getController(this.controllerId);
-    renderer.xr.getControllerGrip(this.controllerId);
-
-    this.handedness = this.isRightHand ? 'right' : 'left';
+    const controllerId = this.hand === '1' ? 1 : 0;
+    renderer.xr.getController(controllerId);
+    renderer.xr.getControllerGrip(controllerId);
   }
 
   update() {
     if (!this.controller) {
       this.detectController();
-      return;
     }
   }
 
@@ -52,9 +50,10 @@ export default class XRInputSource extends RE.Component {
       return;
     }
 
+    const handedness = this.hand === '1' ? 'right' : 'left';
     let controllerId: number = -1;
     for (let id in inputSources) {
-      if (inputSources[id].handedness === this.handedness) {
+      if (inputSources[id].handedness === handedness) {
         controllerId = parseInt(id);
       }
     }
@@ -81,14 +80,9 @@ export default class XRInputSource extends RE.Component {
     }
 
     const loader = new GLTFLoader();
-    loader.load(
-        // resource URL
-        assetPath,
-        // called when the resource is loaded
-        ( gltf ) => {
-          this.object3d.add( gltf.scene );
-        }
-    );
+    loader.load(assetPath, (gltf) => {
+      this.object3d.add( gltf.scene );
+    });
   }
 
   addEventListener(event: string, func) {
@@ -97,7 +91,6 @@ export default class XRInputSource extends RE.Component {
       return;
     }
 
-    console.log('It is me', this.handedness, this.controller);
     this.controller.addEventListener(event, func);
   }
 }
